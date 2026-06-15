@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="slides-format" content="viewport">
+    <title>Periodic Table & Periodicity — Riddhima Sharma, Class XI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg: #070b14;
+            --color-bg-deep: #020408;
+            --color-surface: #0d1526;
+            --color-text: #e8f4ff;
+            --color-text-secondary: #a8c8f0;
+            --color-text-muted: #5a8abf;
+            --color-accent-1: #38bdf8;
+            --color-accent-2: #818cf8;
+            --color-accent-3: #34d399;
+            --color-glass-bg: rgba(56,189,248,0.05);
+            --color-glass-border: rgba(56,189,248,0.12);
+            --color-vignette: rgba(0,0,0,0.5);
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+        }
+    </style>
+    <style>
+        :root {
+            --color-bg: #070b14;
+            --color-text: #e8f4ff;
+            --glow-color-rgb: 56,189,248;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { background: var(--color-bg); margin: 0; }
+        body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--color-text); overflow: hidden; height: 100vh; width: 100vw; }
+        .deck { width: 100vw; height: 100vh; position: relative; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transform: scale(0.95); transition: opacity 0.7s ease, transform 0.7s ease; pointer-events: none; overflow: hidden; }
+        .slide.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .slide > .content { position: relative; z-index: 2; width: 100%; max-width: 1100px; padding: clamp(1.5rem, 4vw, 3.5rem); }
+        .nav-controls { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; z-index: 100; background: rgba(7,11,20,0.85); backdrop-filter: blur(12px); padding: 8px 20px; border-radius: 40px; border: 1px solid rgba(56,189,248,0.15); }
+        .nav-btn { width: 36px; height: 36px; border: none; background: rgba(56,189,248,0.08); color: #38bdf8; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .nav-btn:hover { background: rgba(56,189,248,0.18); }
+        .slide-dots { display: flex; gap: 6px; }
+        .slide-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(56,189,248,0.2); cursor: pointer; transition: background 0.3s, transform 0.3s; }
+        .slide-dots .dot.active { background: #38bdf8; transform: scale(1.4); }
+        .slide-counter { font-size: 0.75rem; color: #5a8abf; min-width: 36px; text-align: center; font-family: 'DM Sans', sans-serif; }
+        .reveal { opacity: 0; transform: translateY(20px); }
+        .text-glow { text-shadow: 0 0 20px rgba(56,189,248,0.5), 0 0 40px rgba(56,189,248,0.2); }
+        .stat-glow { text-shadow: 0 0 30px rgba(56,189,248,0.6), 0 0 60px rgba(56,189,248,0.25); }
+        @keyframes glow-pulse {
+            0%, 100% { text-shadow: 0 0 20px rgba(56,189,248,0.5), 0 0 40px rgba(56,189,248,0.2); }
+            50% { text-shadow: 0 0 35px rgba(56,189,248,0.9), 0 0 70px rgba(56,189,248,0.4); }
+        }
+        .glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+        @keyframes float-slow { 0% { transform: translate(0,0) scale(1); } 25% { transform: translate(60px,-50px) scale(1.12); } 50% { transform: translate(-40px,40px) scale(0.9); } 75% { transform: translate(50px,20px) scale(1.08); } 100% { transform: translate(0,0) scale(1); } }
+        @keyframes float-drift { 0% { transform: translate(0,0) scale(1) rotate(0deg); } 33% { transform: translate(-50px,-60px) scale(1.15) rotate(3deg); } 66% { transform: translate(40px,30px) scale(0.88) rotate(-2deg); } 100% { transform: translate(0,0) scale(1) rotate(0deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+        .gradient-mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: float-slow 10s ease-in-out infinite; }
+        .blob:nth-child(2) { animation: float-drift 14s ease-in-out infinite; }
+        .blob:nth-child(3) { animation: float-slow 18s ease-in-out infinite reverse; }
+        .slide::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); background-size: 256px; opacity: 0.03; mix-blend-mode: overlay; }
+        .slide::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, transparent 50%, var(--color-vignette) 100%); }
+
+        /* Element tile */
+        .elem-tile { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 8px; border: 1px solid rgba(56,189,248,0.3); background: rgba(56,189,248,0.07); font-family: 'DM Sans', sans-serif; }
+        .elem-tile .sym { font-size: 1.5rem; font-weight: 700; color: #38bdf8; line-height: 1; }
+        .elem-tile .num { font-size: 0.55rem; color: #5a8abf; }
+        .elem-tile .name { font-size: 0.42rem; color: #5a8abf; }
+
+        /* Timeline strip */
+        .timeline-strip { display: flex; align-items: center; gap: 0; width: 100%; }
+        .tl-node { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .tl-dot { width: 16px; height: 16px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 12px rgba(56,189,248,0.6); flex-shrink: 0; }
+        .tl-line { flex: 1; height: 2px; background: linear-gradient(90deg, #38bdf8, #818cf8); }
+
+        /* Block colors */
+        .s-block { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35); }
+        .p-block { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.35); }
+        .d-block { background: rgba(251,146,60,0.15); border: 1px solid rgba(251,146,60,0.35); }
+        .f-block { background: rgba(192,132,252,0.15); border: 1px solid rgba(192,132,252,0.35); }
+
+        /* Trend arrow visual */
+        .trend-box { background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.12); border-radius: 12px; padding: 0.75rem 1rem; }
+        .trend-arrow { font-size: 1.1rem; font-weight: 700; }
+        .arr-down { color: #34d399; }
+        .arr-up { color: #f87171; }
+        .arr-across-up { color: #38bdf8; }
+        .arr-across-down { color: #fbbf24; }
+
+        /* Orbital box diagram */
+        .orbital-box { display: inline-flex; gap: 3px; align-items: center; }
+        .orb { width: 28px; height: 28px; border: 1.5px solid rgba(56,189,248,0.4); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+        .orb .up { color: #38bdf8; }
+        .orb .dn { color: #f87171; }
+
+        /* Summary table */
+        .sum-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .sum-table th { background: rgba(56,189,248,0.12); color: #38bdf8; padding: 8px 12px; text-align: left; border-bottom: 1px solid rgba(56,189,248,0.2); font-family: 'DM Sans', sans-serif; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.72rem; }
+        .sum-table td { padding: 7px 12px; border-bottom: 1px solid rgba(56,189,248,0.07); color: #a8c8f0; vertical-align: middle; }
+        .sum-table tr:last-child td { border-bottom: none; }
+        .sum-table tr:hover td { background: rgba(56,189,248,0.04); }
+
+        /* Infographic stat boxes */
+        .stat-pill { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.9rem 1.4rem; border-radius: 14px; background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.18); }
+
+        /* Neon element badge */
+        @keyframes neon-flicker { 0%,100%{opacity:1}92%{opacity:0.95}94%{opacity:0.7}96%{opacity:1} }
+        .neon-badge { animation: neon-flicker 4s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+<div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
+<div class="deck">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" data-slide="1">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:520px;height:520px;top:-120px;right:-100px;background:#38bdf8;opacity:0.13;"></div>
+        <div class="blob" style="width:350px;height:350px;bottom:-80px;left:-60px;background:#818cf8;opacity:0.12;"></div>
+        <div class="blob" style="width:220px;height:220px;top:40%;left:12%;background:#34d399;opacity:0.09;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content text-center">
+        <!-- Neon element tiles as hero -->
+        <div class="flex justify-center gap-4 mb-6 reveal neon-badge">
+            <div class="elem-tile" style="width:72px;height:72px;background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.5);box-shadow:0 0 20px rgba(56,189,248,0.25);">
+                <span class="num" style="font-size:0.6rem;color:#5a8abf;">1</span>
+                <span class="sym" style="font-size:1.8rem;">H</span>
+                <span class="name" style="font-size:0.5rem;color:#5a8abf;">Hydrogen</span>
+            </div>
+            <div class="elem-tile" style="width:72px;height:72px;background:rgba(129,140,248,0.12);border-color:rgba(129,140,248,0.5);box-shadow:0 0 20px rgba(129,140,248,0.25);">
+                <span class="num" style="font-size:0.6rem;color:#818cf8;">2</span>
+                <span class="sym" style="font-size:1.8rem;color:#818cf8;">He</span>
+                <span class="name" style="font-size:0.5rem;color:#818cf8;">Helium</span>
+            </div>
+            <div class="elem-tile" style="width:72px;height:72px;background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.5);box-shadow:0 0 20px rgba(52,211,153,0.25);">
+                <span class="num" style="font-size:0.6rem;color:#34d399;">3</span>
+                <span class="sym" style="font-size:1.8rem;color:#34d399;">Li</span>
+                <span class="name" style="font-size:0.5rem;color:#34d399;">Lithium</span>
+            </div>
+        </div>
+        <h1 class="font-display text-[clamp(2.8rem,5.5vw,4.6rem)] font-bold bg-linear-to-br from-accent-1 via-accent-2 to-accent-3 bg-clip-text text-transparent tracking-tight mb-3 reveal glow-pulse">Periodic Table & Periodicity</h1>
+        <p class="text-[clamp(0.85rem,1.3vw,1.1rem)] text-text-muted tracking-[5px] uppercase mb-5 reveal">Chemistry · Class XI · ABPS Baikunth</p>
+        <div class="inline-flex flex-col items-center gap-1 reveal">
+            <span class="text-text-secondary text-base font-medium">Riddhima Sharma</span>
+            <span class="text-text-muted text-sm">Class XI · A</span>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 2: INTRODUCTION -->
+<div class="slide" data-slide="2">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:380px;height:380px;top:-90px;right:-80px;background:#38bdf8;opacity:0.08;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;left:-50px;background:#818cf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 02 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-1 mb-6 reveal">Introduction</h2>
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div class="reveal" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-left:3px solid #38bdf8;border-radius:10px;padding:1.2rem 1.4rem;">
+                <p class="text-sm text-text-muted uppercase tracking-wider mb-2 font-semibold">What is the Periodic Table?</p>
+                <p class="text-text-secondary text-[0.95rem] leading-relaxed">Arrangement of all <strong class="text-accent-1">118 elements</strong> by increasing <strong class="text-accent-1">atomic number</strong>, so elements with similar properties are grouped together.</p>
+            </div>
+            <div class="reveal" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-left:3px solid #34d399;border-radius:10px;padding:1.2rem 1.4rem;">
+                <p class="text-sm text-text-muted uppercase tracking-wider mb-2 font-semibold">What is Periodicity?</p>
+                <p class="text-text-secondary text-[0.95rem] leading-relaxed">The <strong class="text-accent-3">repetition of properties</strong> of elements at regular intervals when arranged by atomic number.</p>
+            </div>
+        </div>
+        <!-- 3 stat boxes -->
+        <div class="grid grid-cols-3 gap-4 reveal">
+            <div class="stat-pill text-center">
+                <span class="text-[1.8rem] font-bold text-accent-1 stat-glow font-display">118</span>
+                <span class="text-xs text-text-muted mt-1 uppercase tracking-wide">Elements</span>
+            </div>
+            <div class="stat-pill text-center">
+                <span class="text-[1.8rem] font-bold text-accent-2 stat-glow font-display">7</span>
+                <span class="text-xs text-text-muted mt-1 uppercase tracking-wide">Periods</span>
+            </div>
+            <div class="stat-pill text-center">
+                <span class="text-[1.8rem] font-bold text-accent-3 stat-glow font-display">18</span>
+                <span class="text-xs text-text-muted mt-1 uppercase tracking-wide">Groups</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3: MODERN PERIODIC LAW -->
+<div class="slide" data-slide="3">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:400px;height:400px;top:-100px;left:-80px;background:#818cf8;opacity:0.1;"></div>
+        <div class="blob" style="width:250px;height:250px;bottom:-60px;right:-40px;background:#38bdf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 03 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-2 mb-5 reveal">Modern Periodic Law</h2>
+        <!-- Timeline -->
+        <div class="flex items-center gap-0 mb-6 reveal">
+            <div class="flex flex-col items-center gap-2" style="flex:1">
+                <div style="width:14px;height:14px;border-radius:50%;background:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,0.5);"></div>
+                <span class="text-[0.7rem] text-text-muted uppercase tracking-wider">1869</span>
+                <span class="text-[0.8rem] text-text-secondary font-semibold">Mendeleev</span>
+                <span class="text-[0.7rem] text-text-muted text-center">Arranged by atomic mass</span>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,#fbbf24,#38bdf8);"></div>
+            <div class="flex flex-col items-center gap-2" style="flex:1">
+                <div style="width:14px;height:14px;border-radius:50%;background:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,0.5);"></div>
+                <span class="text-[0.7rem] text-text-muted uppercase tracking-wider">1913</span>
+                <span class="text-[0.8rem] text-text-secondary font-semibold">Moseley</span>
+                <span class="text-[0.7rem] text-text-muted text-center">Atomic number is true basis</span>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,#38bdf8,#34d399);"></div>
+            <div class="flex flex-col items-center gap-2" style="flex:1">
+                <div style="width:14px;height:14px;border-radius:50%;background:#34d399;box-shadow:0 0 10px rgba(52,211,153,0.5);"></div>
+                <span class="text-[0.7rem] text-text-muted uppercase tracking-wider">Modern</span>
+                <span class="text-[0.8rem] text-text-secondary font-semibold">Today</span>
+                <span class="text-[0.7rem] text-text-muted text-center">IUPAC Periodic Table</span>
+            </div>
+        </div>
+        <!-- Law statement -->
+        <div class="reveal" style="background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:1.3rem 1.6rem;position:relative;">
+            <span style="position:absolute;top:-12px;left:20px;background:#0d1526;padding:0 8px;font-size:0.7rem;text-transform:uppercase;letter-spacing:3px;color:#818cf8;">Modern Periodic Law</span>
+            <p class="text-text-secondary text-[1rem] leading-relaxed italic font-display text-[1.2rem]">"The physical and chemical properties of the elements are <strong class="text-accent-2 not-italic">periodic functions of their atomic numbers</strong>."</p>
+        </div>
+        <p class="text-text-muted text-sm mt-3 reveal">Mendeleev predicted <strong class="text-accent-3">Gallium (Eka-aluminium)</strong> & <strong class="text-accent-3">Germanium (Eka-silicon)</strong> before their discovery.</p>
+    </div>
+</div>
+
+<!-- SLIDE 4: STRUCTURE OF PERIODIC TABLE -->
+<div class="slide" data-slide="4">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:350px;height:350px;top:-80px;right:-70px;background:#34d399;opacity:0.08;"></div>
+        <div class="blob" style="width:240px;height:240px;bottom:-50px;left:-40px;background:#38bdf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 04 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-3 mb-5 reveal">Structure of the Periodic Table</h2>
+        <div class="grid grid-cols-2 gap-6 mb-5">
+            <div class="reveal" style="background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.18);border-radius:12px;padding:1.2rem;">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-3xl">↔</span>
+                    <span class="text-accent-1 font-bold text-lg">7 Periods</span>
+                </div>
+                <ul class="text-text-secondary text-sm space-y-1">
+                    <li>• Horizontal rows</li>
+                    <li>• Period number = <strong class="text-accent-1">no. of electron shells</strong></li>
+                    <li>• Period 1: 2 elements; Period 6: 32 elements</li>
+                </ul>
+            </div>
+            <div class="reveal" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:12px;padding:1.2rem;">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-3xl">↕</span>
+                    <span class="text-accent-3 font-bold text-lg">18 Groups</span>
+                </div>
+                <ul class="text-text-secondary text-sm space-y-1">
+                    <li>• Vertical columns</li>
+                    <li>• Group = same <strong class="text-accent-3">valence electrons</strong></li>
+                    <li>• Groups 1–2 (s-block) + 13–18 (p-block)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="reveal" style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.15);border-radius:10px;padding:1rem 1.4rem;">
+            <p class="text-text-secondary text-sm">📌 <strong class="text-accent-2">Electronic Configuration</strong> is the basis — same group = same valence electrons = similar chemical properties. Period number = number of occupied electron shells.</p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5: TYPES OF ELEMENTS (s,p,d,f blocks) -->
+<div class="slide" data-slide="5">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:400px;height:400px;top:-100px;right:-80px;background:#c084fc;opacity:0.09;"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-60px;left:-50px;background:#34d399;opacity:0.08;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 05 / 16</p>
+        <h2 class="font-display text-[clamp(1.8rem,3.5vw,2.6rem)] font-bold text-white mb-5 reveal">Types of Elements — s, p, d, f Blocks</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="reveal s-block" style="border-radius:12px;padding:1.1rem 1.3rem;">
+                <div class="flex items-center gap-2 mb-2">
+                    <span style="font-size:1.4rem;font-weight:800;color:#38bdf8;">s-block</span>
+                    <span style="font-size:0.7rem;background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:99px;border:1px solid rgba(56,189,248,0.3);">Groups 1–2</span>
+                </div>
+                <ul class="text-text-secondary text-[0.85rem] space-y-1">
+                    <li>• Alkali metals (Group 1) & Alkaline earth metals (Group 2)</li>
+                    <li>• Last electron enters s-orbital</li>
+                    <li>• Highly reactive, form ionic compounds</li>
+                </ul>
+            </div>
+            <div class="reveal p-block" style="border-radius:12px;padding:1.1rem 1.3rem;">
+                <div class="flex items-center gap-2 mb-2">
+                    <span style="font-size:1.4rem;font-weight:800;color:#34d399;">p-block</span>
+                    <span style="font-size:0.7rem;background:rgba(52,211,153,0.15);color:#34d399;padding:2px 8px;border-radius:99px;border:1px solid rgba(52,211,153,0.3);">Groups 13–18</span>
+                </div>
+                <ul class="text-text-secondary text-[0.85rem] space-y-1">
+                    <li>• Non-metals, metalloids, noble gases</li>
+                    <li>• Last electron enters p-orbital</li>
+                    <li>• Most diverse block in properties</li>
+                </ul>
+            </div>
+            <div class="reveal d-block" style="border-radius:12px;padding:1.1rem 1.3rem;">
+                <div class="flex items-center gap-2 mb-2">
+                    <span style="font-size:1.4rem;font-weight:800;color:#fb923c;">d-block</span>
+                    <span style="font-size:0.7rem;background:rgba(251,146,60,0.15);color:#fb923c;padding:2px 8px;border-radius:99px;border:1px solid rgba(251,146,60,0.3);">Groups 3–12</span>
+                </div>
+                <ul class="text-text-secondary text-[0.85rem] space-y-1">
+                    <li>• Transition metals (Fe, Cu, Zn…)</li>
+                    <li>• Variable oxidation states</li>
+                    <li>• Good conductors, catalytic properties</li>
+                </ul>
+            </div>
+            <div class="reveal f-block" style="border-radius:12px;padding:1.1rem 1.3rem;">
+                <div class="flex items-center gap-2 mb-2">
+                    <span style="font-size:1.4rem;font-weight:800;color:#c084fc;">f-block</span>
+                    <span style="font-size:0.7rem;background:rgba(192,132,252,0.15);color:#c084fc;padding:2px 8px;border-radius:99px;border:1px solid rgba(192,132,252,0.3);">Inner Transition</span>
+                </div>
+                <ul class="text-text-secondary text-[0.85rem] space-y-1">
+                    <li>• Lanthanoids (57–71) & Actinoids (89–103)</li>
+                    <li>• Last electron enters f-orbital</li>
+                    <li>• Placed separately at bottom of table</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6: PERIODIC TRENDS OVERVIEW -->
+<div class="slide" data-slide="6">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:360px;height:360px;top:-80px;left:-70px;background:#38bdf8;opacity:0.09;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;right:-50px;background:#34d399;opacity:0.07;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 06 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-1 mb-2 reveal">Periodic Trends — Overview</h2>
+        <p class="text-text-muted text-sm mb-5 reveal">4 key properties that change predictably across periods and down groups</p>
+        <div class="reveal" style="overflow-x:auto;">
+        <table class="sum-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>→ Across Period</th>
+                    <th>↓ Down Group</th>
+                    <th>Key Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong class="text-accent-1">Atomic Radius</strong></td>
+                    <td><span class="trend-arrow arr-across-down">↓ Decreases</span></td>
+                    <td><span class="trend-arrow arr-down">↑ Increases</span></td>
+                    <td>More nuclear charge / new shells</td>
+                </tr>
+                <tr>
+                    <td><strong class="text-accent-2">Ionization Enthalpy</strong></td>
+                    <td><span class="trend-arrow arr-across-up">↑ Increases</span></td>
+                    <td><span class="trend-arrow arr-up">↓ Decreases</span></td>
+                    <td>Zeff increases / atomic size increases</td>
+                </tr>
+                <tr>
+                    <td><strong class="text-accent-3">Electron Gain Enthalpy</strong></td>
+                    <td><span class="trend-arrow" style="color:#38bdf8;">↑ More negative</span></td>
+                    <td><span class="trend-arrow arr-up">↓ Less negative</span></td>
+                    <td>Smaller atoms attract electrons more</td>
+                </tr>
+                <tr>
+                    <td><strong style="color:#fbbf24;">Electronegativity</strong></td>
+                    <td><span class="trend-arrow arr-across-up">↑ Increases</span></td>
+                    <td><span class="trend-arrow arr-up">↓ Decreases</span></td>
+                    <td>Nuclear pull / shielding effect</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 7: ATOMIC RADIUS -->
+<div class="slide" data-slide="7">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:380px;height:380px;top:-90px;right:-80px;background:#38bdf8;opacity:0.1;"></div>
+        <div class="blob" style="width:240px;height:240px;bottom:-50px;left:-40px;background:#818cf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 07 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-1 mb-1 reveal">Atomic Radius</h2>
+        <p class="text-text-muted text-sm mb-5 reveal">Distance from nucleus to outermost electron shell</p>
+        <div class="grid grid-cols-2 gap-5 mb-4">
+            <!-- Across period visual -->
+            <div class="reveal" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:12px;padding:1.2rem;text-align:center;">
+                <p class="text-accent-1 text-xs uppercase tracking-wider mb-3 font-semibold">→ Across a Period</p>
+                <div class="flex justify-center items-flex-end gap-3 mb-3">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                        <div style="width:52px;height:52px;border-radius:50%;border:2px solid #38bdf8;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#38bdf8;font-size:0.9rem;">Li</div>
+                        <span style="font-size:0.65rem;color:#5a8abf;">152 pm</span>
+                    </div>
+                    <span style="font-size:1.2rem;color:#5a8abf;">→</span>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                        <div style="width:38px;height:38px;border-radius:50%;border:2px solid #38bdf8;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#38bdf8;font-size:0.9rem;">Ne</div>
+                        <span style="font-size:0.65rem;color:#5a8abf;">38 pm</span>
+                    </div>
+                </div>
+                <p style="font-size:0.78rem;color:#a8c8f0;">Decreases — more protons pull electrons <strong class="text-accent-1">closer</strong> without adding new shells</p>
+            </div>
+            <!-- Down group visual -->
+            <div class="reveal" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:12px;padding:1.2rem;text-align:center;">
+                <p class="text-accent-3 text-xs uppercase tracking-wider mb-3 font-semibold">↓ Down a Group</p>
+                <div class="flex flex-col items-center gap-2 mb-3">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:32px;height:32px;border-radius:50%;border:2px solid #34d399;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#34d399;font-size:0.8rem;">Li</div>
+                        <span style="font-size:0.65rem;color:#5a8abf;">152 pm</span>
+                    </div>
+                    <span style="color:#5a8abf;font-size:0.9rem;">↓</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:44px;height:44px;border-radius:50%;border:2px solid #34d399;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#34d399;font-size:0.85rem;">Na</div>
+                        <span style="font-size:0.65rem;color:#5a8abf;">186 pm</span>
+                    </div>
+                </div>
+                <p style="font-size:0.78rem;color:#a8c8f0;">Increases — new electron shells are <strong class="text-accent-3">added</strong> in each period</p>
+            </div>
+        </div>
+        <div class="reveal" style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:0.7rem 1rem;">
+            <p class="text-sm" style="color:#fbbf24;">⚡ Example: F (64 pm) &lt; Cl (99 pm) &lt; Br (114 pm) — down Group 17, radius increases with each new shell.</p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 8: IONIZATION ENTHALPY -->
+<div class="slide" data-slide="8">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:400px;height:400px;top:-100px;left:-80px;background:#818cf8;opacity:0.1;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;right:-50px;background:#38bdf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 08 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-2 mb-1 reveal">Ionization Enthalpy</h2>
+        <p class="text-text-muted text-sm mb-4 reveal">Minimum energy required to remove the outermost electron from a gaseous atom (kJ/mol)</p>
+        <div class="grid grid-cols-2 gap-5 mb-4">
+            <div class="reveal" style="background:rgba(129,140,248,0.07);border:1px solid rgba(129,140,248,0.18);border-radius:12px;padding:1.1rem;">
+                <p class="text-accent-2 text-xs uppercase tracking-wider mb-2 font-semibold">Period 2 IE₁ Values (kJ/mol)</p>
+                <!-- Mini bar chart -->
+                <div style="display:flex;align-items:flex-end;gap:5px;height:80px;">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">520</span>
+                        <div class="bar" data-height="43" style="width:100%;background:linear-gradient(0deg,#818cf8,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#a8c8f0;">Li</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">900</span>
+                        <div class="bar" data-height="75" style="width:100%;background:linear-gradient(0deg,#818cf8,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#a8c8f0;">Be</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">801</span>
+                        <div class="bar" data-height="67" style="width:100%;background:linear-gradient(0deg,#fbbf24,#fb923c);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#fbbf24;font-weight:700;">B</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">1086</span>
+                        <div class="bar" data-height="90" style="width:100%;background:linear-gradient(0deg,#818cf8,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#a8c8f0;">C</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">1402</span>
+                        <div class="bar" data-height="100" style="width:100%;background:linear-gradient(0deg,#34d399,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#34d399;font-weight:700;">N</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">1314</span>
+                        <div class="bar" data-height="94" style="width:100%;background:linear-gradient(0deg,#fbbf24,#fb923c);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#fbbf24;font-weight:700;">O</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">1681</span>
+                        <div class="bar" data-height="95" style="width:100%;background:linear-gradient(0deg,#818cf8,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#a8c8f0;">F</span>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <span style="font-size:0.45rem;color:#5a8abf;">2081</span>
+                        <div class="bar" data-height="100" style="width:100%;background:linear-gradient(0deg,#34d399,#38bdf8);border-radius:3px 3px 0 0;"></div>
+                        <span style="font-size:0.5rem;color:#a8c8f0;">Ne</span>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:12px;padding:1.1rem;">
+                <p class="text-accent-1 text-xs uppercase tracking-wider mb-3 font-semibold">General Trends</p>
+                <ul class="text-text-secondary text-sm space-y-2">
+                    <li>→ <strong class="text-accent-1">Increases</strong> across a period (↑ Zeff, ↓ radius)</li>
+                    <li>↓ <strong class="text-accent-3">Decreases</strong> down a group (↑ atomic size)</li>
+                </ul>
+                <div style="margin-top:12px;padding:8px 10px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;">
+                    <p class="text-xs" style="color:#fbbf24;font-weight:700;">⚠ Anomalies</p>
+                    <p class="text-xs text-text-muted mt-1"><strong style="color:#fbbf24;">Be &gt; B:</strong> fully filled 2s² is stable</p>
+                    <p class="text-xs text-text-muted"><strong style="color:#fbbf24;">N &gt; O:</strong> half-filled 2p³ extra stability</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 9: ELECTRON GAIN ENTHALPY & ELECTRONEGATIVITY -->
+<div class="slide" data-slide="9">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:380px;height:380px;top:-90px;right:-70px;background:#34d399;opacity:0.09;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;left:-50px;background:#fbbf24;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 09 / 16</p>
+        <h2 class="font-display text-[clamp(1.7rem,3.5vw,2.6rem)] font-bold text-accent-3 mb-4 reveal">Electron Gain Enthalpy & Electronegativity</h2>
+        <div class="grid grid-cols-2 gap-5 mb-4">
+            <div class="reveal" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-left:3px solid #34d399;border-radius:12px;padding:1.2rem;">
+                <p class="text-accent-3 font-bold text-base mb-2">Electron Gain Enthalpy (EGA)</p>
+                <p class="text-text-secondary text-sm mb-3">Energy change when a gaseous atom <strong class="text-accent-3">gains one electron</strong></p>
+                <ul class="text-text-secondary text-sm space-y-1">
+                    <li>→ Becomes <strong class="text-accent-3">more negative</strong> across a period</li>
+                    <li>↓ Becomes <strong class="text-text-muted">less negative</strong> down a group</li>
+                    <li>⚡ Cl has <strong class="text-accent-3">highest EGA</strong> (−349 kJ/mol)</li>
+                    <li>🚫 Noble gases — <strong style="color:#f87171;">zero / positive</strong> EGA</li>
+                </ul>
+            </div>
+            <div class="reveal" style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);border-left:3px solid #fbbf24;border-radius:12px;padding:1.2rem;">
+                <p style="color:#fbbf24;" class="font-bold text-base mb-2">Electronegativity (EN)</p>
+                <p class="text-text-secondary text-sm mb-3">Tendency to attract a <strong style="color:#fbbf24;">bonding pair</strong> of electrons (Pauling scale)</p>
+                <ul class="text-text-secondary text-sm space-y-1">
+                    <li>→ <strong style="color:#fbbf24;">Increases</strong> across a period</li>
+                    <li>↓ <strong class="text-text-muted">Decreases</strong> down a group</li>
+                    <li>⭐ <strong style="color:#fbbf24;">F = 3.98</strong> (highest of all elements)</li>
+                    <li>🥈 O = 3.44 &nbsp;|&nbsp; N = 3.04 &nbsp;|&nbsp; Cl = 3.16</li>
+                </ul>
+            </div>
+        </div>
+        <!-- EN gradient visual -->
+        <div class="reveal" style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.12);border-radius:10px;padding:0.9rem 1.2rem;">
+            <p class="text-xs text-text-muted uppercase tracking-wider mb-2">EN Gradient across Period 2</p>
+            <div class="flex gap-1 items-center">
+                <span class="text-xs text-text-muted mr-1">Li<br>0.98</span>
+                <div style="flex:1;height:18px;border-radius:4px;background:linear-gradient(90deg,rgba(56,189,248,0.3),rgba(52,211,153,0.5),rgba(251,191,36,0.7),rgba(248,113,113,0.9));"></div>
+                <span class="text-xs text-text-muted ml-1">F<br>3.98</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1 text-center">← Low electronegativity &nbsp;&nbsp;&nbsp; High electronegativity →</p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 10: FACTORS AFFECTING PERIODICITY -->
+<div class="slide" data-slide="10">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:380px;height:380px;top:-80px;left:-70px;background:#38bdf8;opacity:0.09;"></div>
+        <div class="blob" style="width:240px;height:240px;bottom:-50px;right:-40px;background:#818cf8;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 10 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-1 mb-5 reveal">Factors Affecting Periodicity</h2>
+        <div class="grid grid-cols-3 gap-4 mb-5">
+            <div class="reveal" style="background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.18);border-radius:12px;padding:1.2rem;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:8px;">⚛️</div>
+                <p class="text-accent-1 font-bold text-sm mb-2">Effective Nuclear Charge (Z<sub>eff</sub>)</p>
+                <p class="text-text-secondary text-xs">Net positive charge experienced by outermost electrons. Z<sub>eff</sub> = Z − σ (shielding constant). Higher Z<sub>eff</sub> → smaller radius, higher IE.</p>
+            </div>
+            <div class="reveal" style="background:rgba(129,140,248,0.07);border:1px solid rgba(129,140,248,0.18);border-radius:12px;padding:1.2rem;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:8px;">🛡️</div>
+                <p class="text-accent-2 font-bold text-sm mb-2">Shielding Effect</p>
+                <p class="text-text-secondary text-xs">Inner shell electrons reduce the nuclear pull on outer electrons. More inner shells → greater shielding → lower Z<sub>eff</sub> felt by outermost electrons.</p>
+            </div>
+            <div class="reveal" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:12px;padding:1.2rem;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:8px;">📏</div>
+                <p class="text-accent-3 font-bold text-sm mb-2">Atomic Size</p>
+                <p class="text-text-secondary text-xs">Larger atoms have loosely held outer electrons with greater distance from nucleus — lower IE, lower EN, less negative EGA.</p>
+            </div>
+        </div>
+        <div class="reveal" style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.12);border-radius:10px;padding:0.9rem 1.4rem;">
+            <p class="text-sm text-text-secondary">🔗 <strong class="text-accent-1">Interconnection:</strong> Z<sub>eff</sub> increases across a period (same shell, more protons) → atomic radius decreases → IE and EN increase. Down a group, shielding increases → Z<sub>eff</sub> felt less → radius increases → IE decreases.</p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 11: ANOMALIES -->
+<div class="slide" data-slide="11">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:400px;height:400px;top:-100px;right:-80px;background:#f87171;opacity:0.07;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;left:-50px;background:#fbbf24;opacity:0.08;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 11 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold mb-1 reveal" style="color:#f87171;">Anomalies in Periodic Trends</h2>
+        <p class="text-text-muted text-sm mb-4 reveal">When orbital stability overrides the general periodic trend</p>
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Be > B -->
+            <div class="reveal" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:1.1rem;">
+                <p class="font-bold text-sm mb-2" style="color:#f87171;">⚠ Be &gt; B (IE)</p>
+                <p class="text-text-secondary text-xs mb-3">Beryllium (900) &gt; Boron (801) kJ/mol</p>
+                <div style="font-family:monospace;font-size:0.75rem;color:#a8c8f0;line-height:1.8;">
+                    <div>Be: 1s² <span style="color:#fbbf24;">[↑↓]</span> ← fully filled 2s²</div>
+                    <div>B: 1s² 2s² <span style="color:#f87171;">[↑]</span> ← lone 2p electron</div>
+                </div>
+                <p class="text-xs text-text-muted mt-2">Fully-filled 2s² is extra stable — harder to remove</p>
+            </div>
+            <!-- N > O -->
+            <div class="reveal" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:1.1rem;">
+                <p class="font-bold text-sm mb-2" style="color:#fbbf24;">⚠ N &gt; O (IE)</p>
+                <p class="text-text-secondary text-xs mb-3">Nitrogen (1402) &gt; Oxygen (1314) kJ/mol</p>
+                <div style="font-family:monospace;font-size:0.75rem;color:#a8c8f0;line-height:1.8;">
+                    <div>N: 2p³ <span style="color:#34d399;">[↑][↑][↑]</span> ← half-filled</div>
+                    <div>O: 2p⁴ <span style="color:#f87171;">[↑↓][↑][↑]</span> ← paired e⁻</span></div>
+                </div>
+                <p class="text-xs text-text-muted mt-2">Half-filled 2p³ is extra stable; O's paired e⁻ repel easier removal</p>
+            </div>
+            <!-- Noble gases -->
+            <div class="reveal" style="background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:1.1rem;">
+                <p class="font-bold text-sm mb-2" style="color:#818cf8;">⚠ Noble Gases (EGA)</p>
+                <p class="text-text-secondary text-xs mb-3">Zero or positive electron gain enthalpy</p>
+                <div style="font-family:monospace;font-size:0.75rem;color:#a8c8f0;line-height:1.8;">
+                    <div>He: 1s² <span style="color:#818cf8;">[↑↓]</span> fully filled</div>
+                    <div>Ne: 2p⁶ <span style="color:#818cf8;">[↑↓][↑↓][↑↓]</span></div>
+                </div>
+                <p class="text-xs text-text-muted mt-2">Complete octet — gaining an electron would be energetically unfavourable</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 12: SUMMARY TABLE -->
+<div class="slide" data-slide="12">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:360px;height:360px;top:-80px;right:-70px;background:#38bdf8;opacity:0.08;"></div>
+        <div class="blob" style="width:240px;height:240px;bottom:-50px;left:-40px;background:#34d399;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 12 / 16</p>
+        <h2 class="font-display text-[clamp(1.8rem,3.5vw,2.6rem)] font-bold text-accent-1 mb-4 reveal">Complete Summary</h2>
+        <div class="reveal" style="overflow-x:auto;">
+        <table class="sum-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Definition</th>
+                    <th>→ Across Period</th>
+                    <th>↓ Down Group</th>
+                    <th>Exception</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong class="text-accent-1">Atomic Radius</strong></td>
+                    <td style="font-size:0.78rem;">Nucleus to outermost shell</td>
+                    <td><span style="color:#f87171;">↓ Decreases</span></td>
+                    <td><span style="color:#34d399;">↑ Increases</span></td>
+                    <td style="font-size:0.78rem;">—</td>
+                </tr>
+                <tr>
+                    <td><strong class="text-accent-2">Ionization Enthalpy</strong></td>
+                    <td style="font-size:0.78rem;">Energy to remove outermost e⁻</td>
+                    <td><span style="color:#34d399;">↑ Increases</span></td>
+                    <td><span style="color:#f87171;">↓ Decreases</span></td>
+                    <td style="font-size:0.78rem;color:#fbbf24;">Be&gt;B, N&gt;O</td>
+                </tr>
+                <tr>
+                    <td><strong class="text-accent-3">Electron Gain Enthalpy</strong></td>
+                    <td style="font-size:0.78rem;">ΔH when e⁻ is added</td>
+                    <td><span style="color:#34d399;">↑ More negative</span></td>
+                    <td><span style="color:#f87171;">↓ Less negative</span></td>
+                    <td style="font-size:0.78rem;color:#fbbf24;">Noble gases ≈ 0</td>
+                </tr>
+                <tr>
+                    <td><strong style="color:#fbbf24;">Electronegativity</strong></td>
+                    <td style="font-size:0.78rem;">Attract bonding electrons</td>
+                    <td><span style="color:#34d399;">↑ Increases</span></td>
+                    <td><span style="color:#f87171;">↓ Decreases</span></td>
+                    <td style="font-size:0.78rem;color:#fbbf24;">F = 3.98 (highest)</td>
+                </tr>
+                <tr>
+                    <td><strong style="color:#818cf8;">Metallic Character</strong></td>
+                    <td style="font-size:0.78rem;">Tendency to lose electrons</td>
+                    <td><span style="color:#f87171;">↓ Decreases</span></td>
+                    <td><span style="color:#34d399;">↑ Increases</span></td>
+                    <td style="font-size:0.78rem;">—</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="text-text-muted text-xs mt-3 reveal">💡 Quick recall: <span style="color:#38bdf8;">→ across period</span> — radius ↓, IE ↑, EN ↑ &nbsp;|&nbsp; <span style="color:#34d399;">↓ down group</span> — radius ↑, IE ↓, EN ↓</p>
+    </div>
+</div>
+
+<!-- SLIDE 13: IMPORTANCE -->
+<div class="slide" data-slide="13">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:380px;height:380px;top:-90px;left:-70px;background:#34d399;opacity:0.09;"></div>
+        <div class="blob" style="width:260px;height:260px;bottom:-60px;right:-50px;background:#38bdf8;opacity:0.08;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 13 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-accent-3 mb-5 reveal">Importance of the Periodic Table</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="reveal" style="background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.15);border-radius:12px;padding:1.1rem;display:flex;gap:12px;align-items:flex-start;">
+                <span style="font-size:1.6rem;flex-shrink:0;">🔍</span>
+                <div>
+                    <p class="text-accent-1 font-semibold text-sm mb-1">Predicts Properties</p>
+                    <p class="text-text-secondary text-xs">Knowing an element's position tells us its reactivity, bonding behaviour, and physical properties.</p>
+                </div>
+            </div>
+            <div class="reveal" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.15);border-radius:12px;padding:1.1rem;display:flex;gap:12px;align-items:flex-start;">
+                <span style="font-size:1.6rem;flex-shrink:0;">🧪</span>
+                <div>
+                    <p class="text-accent-3 font-semibold text-sm mb-1">Element Discovery</p>
+                    <p class="text-text-secondary text-xs">Mendeleev predicted <strong class="text-accent-3">Gallium</strong> (eka-aluminium) and <strong class="text-accent-3">Germanium</strong> (eka-silicon) decades before their discovery.</p>
+                </div>
+            </div>
+            <div class="reveal" style="background:rgba(129,140,248,0.07);border:1px solid rgba(129,140,248,0.15);border-radius:12px;padding:1.1rem;display:flex;gap:12px;align-items:flex-start;">
+                <span style="font-size:1.6rem;flex-shrink:0;">⚗️</span>
+                <div>
+                    <p class="text-accent-2 font-semibold text-sm mb-1">Guides Chemistry</p>
+                    <p class="text-text-secondary text-xs">Foundation of all chemical sciences — reaction prediction, industrial processes, pharmaceutical design.</p>
+                </div>
+            </div>
+            <div class="reveal" style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.15);border-radius:12px;padding:1.1rem;display:flex;gap:12px;align-items:flex-start;">
+                <span style="font-size:1.6rem;flex-shrink:0;">💡</span>
+                <div>
+                    <p style="color:#fbbf24;" class="font-semibold text-sm mb-1">Materials Science</p>
+                    <p class="text-text-secondary text-xs">Semiconductor design, alloy creation, and battery research all rely on periodic trends for material selection.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 14: CONCLUSION -->
+<div class="slide" data-slide="14">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:460px;height:460px;top:-110px;right:-90px;background:#38bdf8;opacity:0.11;"></div>
+        <div class="blob" style="width:320px;height:320px;bottom:-80px;left:-60px;background:#818cf8;opacity:0.1;"></div>
+        <div class="blob" style="width:200px;height:200px;top:35%;left:10%;background:#34d399;opacity:0.08;"></div>
+    </div>
+    <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-2 reveal">Slide 14 / 16</p>
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold text-white mb-6 reveal">Conclusion</h2>
+        <!-- Circular concept wheel approximation using cards -->
+        <div class="grid grid-cols-3 gap-4 mb-5">
+            <div class="reveal" style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:12px;padding:1rem;text-align:center;">
+                <p class="text-accent-1 font-bold text-sm mb-1">Organized by Atomic Number</p>
+                <p class="text-text-muted text-xs">Moseley's law replaced Mendeleev's mass-based arrangement</p>
+            </div>
+            <div class="reveal" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:1rem;text-align:center;">
+                <p class="text-accent-3 font-bold text-sm mb-1">Periodic Trends Predict Behaviour</p>
+                <p class="text-text-muted text-xs">Radius, IE, EGA, EN follow predictable patterns across & down</p>
+            </div>
+            <div class="reveal" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:1rem;text-align:center;">
+                <p style="color:#f87171;" class="font-bold text-sm mb-1">Anomalies from Orbital Stability</p>
+                <p class="text-text-muted text-xs">Half-filled & fully-filled orbitals create exceptions like N&gt;O in IE</p>
+            </div>
+        </div>
+        <div class="reveal" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:12px;padding:1.1rem 1.4rem;text-align:center;">
+            <p class="font-display text-[1.1rem] text-text-secondary italic">"The periodic table is not just a chart — it is a <strong class="text-accent-1">map of the universe</strong>, revealing the hidden order in all matter."</p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 15: ACKNOWLEDGEMENT -->
+<div class="slide" data-slide="15">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:360px;height:360px;top:-80px;right:-70px;background:#818cf8;opacity:0.1;"></div>
+        <div class="blob" style="width:240px;height:240px;bottom:-50px;left:-40px;background:#38bdf8;opacity:0.08;"></div>
+    </div>
+    <div class="content text-center">
+        <p class="text-text-muted text-xs uppercase tracking-[4px] mb-4 reveal">Slide 15 / 16</p>
+        <div style="font-size:3rem;margin-bottom:1rem;" class="reveal">🙏</div>
+        <h2 class="font-display text-[clamp(2rem,4vw,3.2rem)] font-bold text-accent-2 mb-4 reveal">Acknowledgement</h2>
+        <div class="reveal" style="max-width:600px;margin:0 auto;background:rgba(129,140,248,0.07);border:1px solid rgba(129,140,248,0.18);border-radius:16px;padding:1.8rem 2rem;">
+            <p class="text-text-secondary text-[0.95rem] leading-relaxed mb-4">I would like to express my sincere gratitude to my <strong class="text-accent-2">Chemistry teacher</strong> for their guidance, encouragement, and patient explanations throughout this topic.</p>
+            <p class="text-text-secondary text-[0.95rem] leading-relaxed mb-4">I also thank <strong class="text-accent-1">ABPS Baikunth</strong> for providing a wonderful learning environment and resources that made this project possible.</p>
+            <p class="text-text-muted text-sm">Special thanks to my parents and classmates for their constant support and motivation.</p>
+        </div>
+        <!-- Decorative stars -->
+        <div class="flex justify-center gap-6 mt-6 reveal">
+            <span style="color:#fbbf24;font-size:1.2rem;">★</span>
+            <span style="color:#38bdf8;font-size:1rem;">✦</span>
+            <span style="color:#818cf8;font-size:1.4rem;">★</span>
+            <span style="color:#34d399;font-size:1rem;">✦</span>
+            <span style="color:#fbbf24;font-size:1.2rem;">★</span>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 16: THANK YOU -->
+<div class="slide" data-slide="16">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:520px;height:520px;top:-120px;right:-100px;background:#38bdf8;opacity:0.14;"></div>
+        <div class="blob" style="width:380px;height:380px;bottom:-90px;left:-70px;background:#818cf8;opacity:0.12;"></div>
+        <div class="blob" style="width:240px;height:240px;top:30%;left:8%;background:#34d399;opacity:0.09;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content text-center">
+        <!-- Glowing atom SVG -->
+        <div class="reveal" style="margin-bottom:1.5rem;">
+            <svg viewBox="0 0 120 120" width="100" height="100" style="display:inline-block;">
+                <circle cx="60" cy="60" r="8" fill="#38bdf8" style="filter:drop-shadow(0 0 8px #38bdf8);"/>
+                <ellipse cx="60" cy="60" rx="40" ry="16" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.7" style="transform-origin:60px 60px;" transform="rotate(0)"/>
+                <ellipse cx="60" cy="60" rx="40" ry="16" fill="none" stroke="#818cf8" stroke-width="1.5" opacity="0.6" style="transform-origin:60px 60px;" transform="rotate(60)"/>
+                <ellipse cx="60" cy="60" rx="40" ry="16" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.6" style="transform-origin:60px 60px;" transform="rotate(120)"/>
+                <circle cx="100" cy="60" r="4" fill="#38bdf8"/>
+                <circle cx="40" cy="26" r="4" fill="#818cf8"/>
+                <circle cx="40" cy="94" r="4" fill="#34d399"/>
+            </svg>
+        </div>
+        <h1 class="font-display text-[clamp(3rem,7vw,5.5rem)] font-bold bg-linear-to-br from-accent-1 via-accent-2 to-accent-3 bg-clip-text text-transparent mb-3 reveal glow-pulse">Thank You!</h1>
+        <p class="text-text-muted text-[clamp(0.85rem,1.4vw,1.1rem)] tracking-[4px] uppercase mb-6 reveal">Periodic Table & Periodicity · Chemistry · Class XI</p>
+        <div class="reveal inline-flex flex-col items-center gap-1">
+            <span class="text-text-secondary font-semibold">Riddhima Sharma &nbsp;·&nbsp; Class XI-A</span>
+            <span class="text-text-muted text-sm">ABPS Baikunth</span>
+        </div>
+    </div>
+</div>
+
+</div><!-- end .deck -->
+
+<!-- NAVIGATION -->
+<div class="nav-controls">
+    <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
+    <div class="slide-dots" id="dots"></div>
+    <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
+    <span class="slide-counter" id="counter">1 / 16</span>
+</div>
+
+<script>
+    let current = 1;
+    const total = document.querySelectorAll('.slide').length;
+    const dotsContainer = document.getElementById('dots');
+    const counter = document.getElementById('counter');
+    for (let i = 1; i <= total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 1 ? ' active' : '');
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+    }
+    function goToSlide(n) {
+        const prev = document.querySelector('.slide.active');
+        const next = document.querySelector('.slide[data-slide="' + n + '"]');
+        if (prev) prev.classList.remove('active');
+        if (next) { next.classList.add('active'); animateSlide(next); }
+        current = n; updateNav();
+    }
+    function changeSlide(dir) { let n = current + dir; if (n < 1) n = total; if (n > total) n = 1; goToSlide(n); }
+    function updateNav() {
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i + 1 === current));
+        counter.textContent = current + ' / ' + total;
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
+    });
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => { const diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1); });
+
+    function animateSlide(slide) {
+        slide.querySelectorAll('.reveal').forEach((el, i) => {
+            el.style.transition = 'none';
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.offsetHeight;
+            const delay = i * 0.08;
+            el.style.transition = 'opacity 0.35s ease ' + delay + 's, transform 0.35s ease ' + delay + 's';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0px)';
+        });
+        animateSlideEffects(slide);
+    }
+
+    function animateSlideEffects(slide) {
+        slide.querySelectorAll('.bar:not(.bar-init)').forEach((bar, i) => {
+            bar.classList.add('bar-init');
+            bar.style.height = '0%';
+            bar.style.transition = 'height 0.5s ease ' + (i * 0.06) + 's';
+            bar.offsetHeight;
+            bar.style.height = bar.dataset.height + '%';
+        });
+        slide.querySelectorAll('.bar-fill:not(.fill-init)').forEach((bar, i) => {
+            bar.classList.add('fill-init');
+            bar.style.width = '0%';
+            bar.style.transition = 'width 0.5s ease ' + (i * 0.08) + 's';
+            bar.offsetHeight;
+            bar.style.width = bar.dataset.width + '%';
+        });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        const spotlight = document.querySelector('.mouse-spotlight');
+        if (spotlight) {
+            spotlight.style.background = 'radial-gradient(600px circle at ' + e.clientX + 'px ' + e.clientY + 'px, rgba(56,189,248,0.05), transparent 40%)';
+        }
+    });
+
+    window.initParticles = function(canvas, options) {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth || window.innerWidth;
+        canvas.height = canvas.offsetHeight || window.innerHeight;
+        const interactive = options.interactive !== false;
+        const count = options.count || (interactive ? 55 : 18);
+        let mx = -1000, my = -1000;
+        const particles = Array.from({ length: count }, () => ({
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+            size: Math.random() * 2.5 + 0.8, alpha: Math.random() * 0.3 + 0.08
+        }));
+        if (interactive) {
+            canvas.addEventListener('mousemove', (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+            canvas.addEventListener('mouseleave', () => { mx = -1000; my = -1000; });
+        }
+        (function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                if (interactive) { const dx = p.x - mx, dy = p.y - my, dist = Math.sqrt(dx*dx+dy*dy); if (dist < 120) { const f = (120-dist)/120*2; p.vx += (dx/dist)*f*0.1; p.vy += (dy/dist)*f*0.1; } }
+                p.vx *= 0.98; p.vy *= 0.98; p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(56,189,248,' + p.alpha + ')'; ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        })();
+    };
+    document.querySelectorAll('.particle-canvas').forEach(c => window.initParticles(c, {interactive:true,count:55}));
+    document.querySelectorAll('.particle-canvas-ambient').forEach(c => window.initParticles(c, {interactive:false,count:18}));
+
+    try { animateSlide(document.querySelector('.slide.active')); } catch(e) {}
+</script>
+</body>
+</html>
